@@ -7,7 +7,7 @@ The proposed method first decomposes a cardiovascular magnetic resonance image i
 each direction are extractedseparately via a CNN model and the temporal correlation between frames were modeled with a recurrent neural net-work. 
 Finally, we explore the multidirectional relationship offeatures, indices, and directional subbands to optimize thequantification  system. 
 
-The dataset we used can be found at MICCAI 2018 Left Ventricle Full Quantification Challenge.
+The dataset we used can be found at MICCAI 2018 Left Ventricle Full Quantification Challenge, an open source dataset on Kaggle.
 
 
 
