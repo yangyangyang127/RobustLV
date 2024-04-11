@@ -4,7 +4,7 @@ This is an end-to-end framework for accurate and robust left ventricle indices q
 
 The proposed method first decomposes a CMR image into directional frequency bands via Steerable Pyramid Transformation. Then the deep representation of each direction is extracted separately via a CNN model, and we also use an LSTM module to model the temporal dynamics. Finally, we explore the multidirectional relationship of features, indices, and directional subbands to optimize the quantification system. 
 
-<img src="https://github.com/yangyangyang127/LVquant/blob/master/wholeframework.png" width="800" >
+<img src="https://github.com/yangyangyang127/LVquant/blob/master/wholeframework.png" width="950" >
 
 ### Requirements
 Create a conda environment and install dependencies:
