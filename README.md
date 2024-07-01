@@ -18,7 +18,6 @@ conda activate RobustLV
 conda install pytorch torchvision cudatoolkit
 
 pip install -r requirements.txt
-pip install pointnet2_ops_lib/.
 ```
 If you want to test the Mamba module, please refer to [VMamba](https://github.com/MzeroMiko/VMamba/tree/main) to set up the environment.
 
