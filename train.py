@@ -1,16 +1,11 @@
 import torch
 import random
+import argparse
 import numpy as np
 
 from utils import *
-from config import params
 from datasets.cardiac_dig import CardiacDigProvider
-from datasets.MMdataset import MMDatasetProvider
-
-if(params['dataset'] == 'cardiac_dig'):
-    from models.CardiacDig_model import RobustNet
-elif(params['dataset'] == 'MMdataset'):
-    from models.MMdataset_model import RobustNet
+from models.CardiacDig_model import RobustNet
 
 
 # Use GPU if available.
@@ -106,12 +101,31 @@ def valid(model, valid_loader, criterion_test):
     return all_loss, all_out, all_label
 
 
-
 def main():
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", default='cardiac_dig', help="dataset")
+    parser.add_argument("--dataset_dir", default="./data/ACDC/")
+    parser.add_argument("--save_path", default="./pretrained/")
+    
+    parser.add_argument("--cross_valid", default=2)
+    
+    parser.add_argument("--batch_size", default=4, help="batch size")
+    parser.add_argument("--lr", default=1e-3, help="learning rate")
+    parser.add_argument("--lr_gamma", default=0.2) 
+    parser.add_argument("--num_epochs", default=400)
+    parser.add_argument("--img_size", default=80)
+    parser.add_argument("--save_interval", default=10)
+    parser.add_argument("--multistep", default=[150, 250, 350])
+    
+    parser.add_argument("--n_gpu", default=1)
+    parser.add_argument("--checkpoint", default=None)      
+    args = parser.parse_args()
+    
 
-    model = RobustNet(params).to(device)
+    model = RobustNet(args).to(device)
 
-    pretrained_path = 'checkpoint/model_best_test_{}.pt'.format(params['dataset'])
+    pretrained_path = 'checkpoint/model_best_test_{}.pt'.format(args.dataset)
     if os.path.exists(pretrained_path):
         pretrained_dict = torch.load(pretrained_path)
         model.load_state_dict(pretrained_dict['model'])
@@ -128,23 +142,21 @@ def main():
     temporal_params = list(map(id, model.temporal.parameters()))
     base_params = filter(lambda p: id(p) not in temporal_params, model.parameters())
     optimizer = torch.optim.Adam([
-                 {'params': model.temporal.parameters(), 'lr': params['lr']},
-                 {'params': base_params, 'lr': params['lr']}], weight_decay=0.0001)
+                 {'params': model.temporal.parameters(), 'lr': args.lr},
+                 {'params': base_params, 'lr': args.lr}], weight_decay=0.0001)
     # optimizer = optim.Adam([{'params': model.parameters()}], lr=params['lr'], betas=(params['beta1'], params['beta2']))
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, 
-                        milestones=params['multistep'], gamma=params['lr_gamma'])
+                        milestones=args.multistep, gamma=args.lr_gamma)
 
     print("-"*25)
     print("Starting Training Loop...\n")
     print("-"*25)
 
     best_mae = 1000000.
-    for epoch in range(params['num_epochs']):
+    for epoch in range(args.num_epochs):
     #for path in paths1:
-        if(params['dataset'] == 'cardiac_dig'):
-            dataset = CardiacDigProvider(params['batch_size'], params['cross_valid'])
-        elif(params['dataset'] == 'MMdataset'):
-            dataset = MMDatasetProvider(bs=params['batch_size'])
+        if(args.dataset == 'cardiac_dig'):
+            dataset = CardiacDigProvider(args.batch_size, args.cross_valid)
         train_loader, test_loader, valid_loader = dataset.train, dataset.test, dataset.valid
         
         model.train()
@@ -160,12 +172,18 @@ def main():
         if epoch % 10 == 0:
             print('Epoch: ', epoch)
             print('Valid Loss: ', avg_loss[:2].mean(), avg_loss[2:5].mean(), avg_loss[5:].mean())
+        
+        os.makedirs(args.save_path, exist_ok=True)
+        if epoch > 1 and epoch % args.save_interval == 0:
+            file_path = os.path.join('pretrained/cv{}-epoch{}.pkl'.format(args.cross_valid, epoch))
+            save(model, file_path)
+        
         if avg_loss[:2].mean() < best_mae:
             best_mae = avg_loss[:2].mean()
-            file_path = os.path.join("pretrained/", str(params['cross_valid']) + '-test_best.pkl')
+            file_path = os.path.join('pretrained/cv{}-test_best.pkl'.format(args.cross_valid))
             save(model, file_path)
     
-    best_path = os.path.join("pretrained/", str(params['cross_valid']) + '-test_best.pkl')
+    best_path = os.path.join(args.save_path, str(args.cross_valid) + '-test_best.pkl')
     if os.path.exists(best_path):
         load_checkpoint(model, best_path, device)
         
