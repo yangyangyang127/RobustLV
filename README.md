@@ -16,8 +16,6 @@ conda activate RobustLV
 
 # Install the according versions of torch and torchvision
 conda install pytorch torchvision cudatoolkit
-
-pip install -r requirements.txt
 ```
 If you want to test the Mamba module, please refer to [VMamba](https://github.com/MzeroMiko/VMamba/tree/main) to set up the environment.
 
