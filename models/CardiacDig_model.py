@@ -111,9 +111,9 @@ class Encoder04(nn.Module):
         self.conv0 = nn.Sequential(nn.Conv2d(5, 60, kernel_size=7, stride=1, padding=3, dilation=1),
                                     nn.BatchNorm2d(60),
                                     nn.LeakyReLU(0.2, inplace=True),
-                                    nn.Conv2d(60, 60, kernel_size=7, stride=1, padding=3, dilation=1),
-                                    nn.BatchNorm2d(60),
-                                    nn.LeakyReLU(0.2, inplace=True)
+                                    # nn.Conv2d(60, 60, kernel_size=7, stride=1, padding=3, dilation=1),
+                                    # nn.BatchNorm2d(60),
+                                    # nn.LeakyReLU(0.2, inplace=True)
                                     )   # 40x40x16
                                    
         self.conv1 = nn.Sequential(nn.Conv2d(60, 120, kernel_size=5, stride=1, padding=2, dilation=1),
@@ -237,7 +237,7 @@ class TemporalModel(nn.Module):
 
     
 class RobustNet(nn.Module):
-    def __init__(self, params):
+    def __init__(self, args):
         super(RobustNet, self).__init__()
         
         self.bn1 = nn.Sequential(nn.BatchNorm2d(5),
@@ -249,8 +249,8 @@ class RobustNet(nn.Module):
         self.bn3 = nn.Sequential(nn.BatchNorm2d(5),
                                   nn.LeakyReLU(0.2, inplace=True))
 
-        if params['cross_valid'] in [0, 1, 2, 3, 4]:
-            print('Encoder 04.   CrossValid: {}'.format(params['cross_valid']))
+        if args.cross_valid in [0, 1, 2, 3, 4]:
+            print('Encoder 04.   CrossValid: {}'.format(args.cross_valid))
             self.encoder = Encoder04()
         else:
             self.encoder = Encoder123()
