@@ -16,9 +16,9 @@ def seed_worker(worker_id):
 g = torch.Generator()
 g.manual_seed(0)
 
-train_range = {0: [*range(0,101)], 1: [*range(0,72)]+[*range(116,145)], 2: [*range(0,43)]+[*range(87,145)],
+train_range = {0: [*range(0,101)], 1: [*range(0,72)]+[*range(116,145)], 2: [*range(0,28)]+[*range(43,58)]+[*range(87,145)],
                3: [*range(15,29)]+[*range(58,145)], 4: [*range(29,130)]}
-valid_range = {0: [*range(101,116)], 1: [*range(72,87)], 2: [*range(43,58)], 3: [*range(0,15)], 4: [*range(130,145)]}
+valid_range = {0: [*range(101,116)], 1: [*range(72,87)], 2: [*range(28,43)], 3: [*range(0,15)], 4: [*range(130,145)]}
 test_range = {0: [*range(116,145)], 1: [*range(87,116)], 2: [*range(58,87)], 3: [*range(29,58)], 4: [*range(0,29)]}
 
 class CardiacDigDataset(data.Dataset):
